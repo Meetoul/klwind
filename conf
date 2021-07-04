@@ -1,0 +1,3 @@
+USERNAME=user
+KEYBOARD_DEVICE="1:1:AT_Translated_Set_2_keyboard"
+DEFAULT_LAYOUT_INDEX=0

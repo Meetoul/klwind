@@ -1,0 +1,9 @@
+#!/bin/sh
+exec 2>&1
+[ -s conf ] && . ./conf
+
+# it is required for swaymsg to work when called as root
+export XDG_RUNTIME_DIR=/run/$USERNAME/1000
+export SWAYSOCK=$(ls $XDG_RUNTIME_DIR/sway-ipc.* | head -n1)
+
+exec /usr/bin/klwind "$KEYBOARD_DEVICE" "$DEFAULT_LAYOUT_INDEX"

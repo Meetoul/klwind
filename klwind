@@ -1,0 +1,32 @@
+#!/usr/bin/env bash
+
+KEYBOARD_DEVICE="$1"
+DEFAULT_LAYOUT_INDEX="$2"
+
+declare -A WIN_KL_MAP
+OLD_WIN_ID=0
+
+set_layout() {
+    swaymsg input "$KEYBOARD_DEVICE" xkb_switch_layout "$1"
+}
+
+get_current_layout() {
+    swaymsg -t get_inputs | grep -oP -m1 '(?<="xkb_active_layout_index": )\d+(?=,)'
+}
+
+process_output() {
+    WIN_KL_MAP[$OLD_WIN_ID]=$(get_current_layout)
+    new_id=$(echo "$1" | grep -oP '(?<="id": )\d+(?=,)')
+    new_layout="${WIN_KL_MAP[$new_id]}"
+    if [ ! -z "$new_layout" ]; then
+        set_layout "$new_layout"
+    else
+        set_layout "$DEFAULT_LAYOUT_INDEX"
+    fi
+    OLD_WIN_ID="$new_id"
+}
+
+while IFS= read -r line
+do
+    process_output "$line"
+done < <(swaymsg -m -t SUBSCRIBE "['window']")
